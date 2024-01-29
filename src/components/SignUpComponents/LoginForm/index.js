@@ -7,39 +7,51 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { setUser } from "../../../slices/userSlice";
+import { toast } from "react-toastify";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     console.log("handling Login...");
+    setLoading(true);
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
+    if (email && password) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
 
-      // Getting user's details from firestore Database
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      const userData = userDoc.data();
-      console.log("UserData", userData);
+        // Getting user's details from firestore Database
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+        console.log("UserData", userData);
 
-      dispatch(
-        setUser({
-          name: userData.name,
-          email: user.email,
-          uid: user.uid,
-        })
-      );
-      navigate("/profile");
-    } catch (error) {
-      console.log("error in Login", error);
+        dispatch(
+          setUser({
+            name: userData.name,
+            email: user.email,
+            uid: user.uid,
+          })
+        );
+        toast.success("LogIn Successful!");
+        setLoading(false);
+        navigate("/profile");
+      } catch (error) {
+        console.log("error in Login", error);
+        toast.error(error.message);
+        setLoading(false);
+      }
+    } else {
+      toast.error("Email or Password is empty!");
+      setLoading(false);
     }
   };
   return (
@@ -58,7 +70,11 @@ function LoginForm() {
         required={true}
         placeholder="Password"
       />
-      <Button text="Login" onClick={handleLogin} />
+      <Button
+        text={loading ? "Loading..." : "Login"}
+        onClick={handleLogin}
+        disabled={loading}
+      />
     </>
   );
 }

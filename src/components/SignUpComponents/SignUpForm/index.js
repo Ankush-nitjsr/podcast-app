@@ -1,27 +1,32 @@
 import React, { useState } from "react";
 import InputComponent from "../../CommonComponents/Input";
 import Button from "../../CommonComponents/Button";
-import { auth, db, storage } from "../../../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { auth, db } from "../../../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../../slices/userSlice";
+import { toast } from "react-toastify";
 
 function SignUpForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
     console.log("handling signUp...");
-    if (password == confirmPassword && password.length >= 6) {
+    setLoading(true);
+    if (
+      password == confirmPassword &&
+      password.length >= 6 &&
+      fullName &&
+      email
+    ) {
       try {
         // Creating user's account in authentication section of firebase
         const userCredential = await createUserWithEmailAndPassword(
@@ -45,11 +50,21 @@ function SignUpForm() {
             uid: user.uid,
           })
         );
+        toast.success("User created successfully!");
+        setLoading(false);
         navigate("/profile");
       } catch (error) {
-        console.log("error in SignIn", error);
+        console.log("error in SignUp", error);
+        toast.error(error.message);
+        setLoading(false);
       }
     } else {
+      if (password !== confirmPassword) {
+        toast.error("Password and confirm Password doesn't match");
+      } else if (password.length < 6) {
+        toast.error("Password length is less than 6 characters");
+      }
+      setLoading(false);
       // throw an error
     }
   };
@@ -84,7 +99,11 @@ function SignUpForm() {
         required={true}
         placeholder="Confirm Password"
       />
-      <Button text="SignUp" onClick={handleSignUp} />
+      <Button
+        text={loading ? "Loading..." : "SignUp"}
+        disabled={loading}
+        onClick={handleSignUp}
+      />
     </>
   );
 }
