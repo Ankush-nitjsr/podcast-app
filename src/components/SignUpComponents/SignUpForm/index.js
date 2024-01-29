@@ -9,6 +9,7 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setUser } from "../../../slices/userSlice";
 
 function SignUpForm() {
   const [fullName, setFullName] = useState("");
