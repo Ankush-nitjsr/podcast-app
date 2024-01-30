@@ -5,6 +5,9 @@ import { toast } from "react-toastify";
 import InputComponent from "../CommonComponents/Input";
 import Button from "../CommonComponents/Button";
 import FileInput from "../CommonComponents/Input/FileInput";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { auth, db, storage } from "../../firebase";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 function CreatePodcastForm() {
   const [title, setTitle] = useState("");
@@ -16,14 +19,52 @@ function CreatePodcastForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (title && desc && displayImage && bannerImage) {
-      // 1. Upload files -> get downloadable links
-      // 2. create a new doc in a new collection called podcasts
-      // 3. save this new podcast episodes states in pur podcast
-      toast.success("Podcast created successfully!");
+      setLoading(true);
+      try {
+        // 1. Upload files -> get downloadable links
+        // create a reference to the display image
+        const displayImageRef = ref(
+          storage,
+          `podcasts/${auth.currentUser.uid}/${Date.now()}` // this creates a folder named podcasts and then file name with uid
+        );
+        await uploadBytes(displayImageRef, displayImage);
+
+        // get downloadable link
+        const displayImageUrl = await getDownloadURL(displayImageRef);
+        // console.log("Image URL is:", displayImageUrl);
+
+        const bannerImageRef = ref(
+          storage,
+          `podcasts/${auth.currentUser.uid}/${Date.now()}` // this creates a folder named podcasts and then file name with uid
+        );
+        await uploadBytes(bannerImageRef, bannerImage);
+
+        // get downloadable link
+        const bannerImageUrl = await getDownloadURL(bannerImageRef);
+
+        // 2. create a new doc in a new collection called podcasts
+        // 3. save this new podcast episodes states in pur podcast
+        const podcastData = {
+          title: title,
+          description: desc,
+          bannerImage: bannerImageUrl,
+          displayImage: displayImageUrl,
+          createdBy: auth.currentUser.uid,
+        };
+        const docRef = await addDoc(collection(db, "podcasts"), podcastData);
+
+        toast.success("Podcast Created Successfully!");
+        setLoading(false);
+      } catch (error) {
+        toast.error(error.message);
+        console.log(error);
+        setLoading(false);
+      }
     } else {
       toast.error("Please Enter All Values");
+      setLoading(false);
     }
   };
 
