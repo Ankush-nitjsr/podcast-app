@@ -20,10 +20,10 @@ function Header() {
           Podcasts
         </Link>
         <Link
-          to="/start-a-podcast"
-          className={currentPath === "/start-a-podcast" ? "active" : ""}
+          to="/create-podcast"
+          className={currentPath === "/create-podcast" ? "active" : ""}
         >
-          Start A Podcast
+          Create Podcast
         </Link>
         <Link
           to="/profile"
