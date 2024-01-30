@@ -59,10 +59,14 @@ function SignUpForm() {
         setLoading(false);
       }
     } else {
-      if (password !== confirmPassword) {
-        toast.error("Password and confirm Password doesn't match");
+      if (fullName == "") {
+        toast.error("full name field is empty");
+      } else if (email == "") {
+        toast.error("email field is empty");
       } else if (password.length < 6) {
         toast.error("Password length is less than 6 characters");
+      } else if (password !== confirmPassword) {
+        toast.error("Password and confirm Password doesn't match");
       }
       setLoading(false);
       // throw an error
