@@ -18,6 +18,10 @@ body {
   color: var(--white);
 }
 
+a {
+  text-decoration: none;
+}
+
 input {
   font-family: "Inter", sans-serif;
 }
@@ -37,4 +41,21 @@ input {
   text-align: center;
   font-weight: 400;
   margin-bottom: 2rem;
+}
+
+.profileDetails {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 4rem auto;
+  margin-left: 14rem;
+}
+
+.podcastCard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
 }

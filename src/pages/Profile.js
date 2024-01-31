@@ -29,19 +29,23 @@ function Profile() {
   return (
     <div>
       <Header />
-      <p>
-        <label>Name: </label>
-        <b>{user.name}</b>
-      </p>
-      <p>
-        <label>Email: </label>
-        <b>{user.email}</b>
-      </p>
-      <p>
-        <label>UID: </label>
-        <b>{user.uid}</b>
-      </p>
-      <Button text={"Logout"} onClick={handleLogout} />
+      <div className="profileDetails">
+        <p>
+          <label>Name: </label>
+          <b>{user.name}</b>
+        </p>
+        <p>
+          <label>Email: </label>
+          <b>{user.email}</b>
+        </p>
+        <p>
+          <label>UID: </label>
+          <b>{user.uid}</b>
+        </p>
+      </div>
+      <div className="input-wrapper">
+        <Button text={"Logout"} onClick={handleLogout} />
+      </div>
     </div>
   );
 }
